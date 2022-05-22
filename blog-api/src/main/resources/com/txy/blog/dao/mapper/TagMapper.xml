@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--MyBatis配置文件-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.txy.blog.dao.mapper.TagMapper">
+
+    <!-- List<Tag> findTagsByArticleId(Long articleId);-->
+    <select id="findTagsByArticleId" parameterType="long" resultType="com.txy.blog.dao.pojo.Tag">
+        select id,avatar,tag_name as tagName from ms_tag
+        where id in
+        (select tag_id from ms_article_tag where article_id=#{articleId})
+    </select>
+<!--    List<Long> findHotsTagIds(int limit);-->
+    <select id="findHotsTagIds" parameterType="int" resultType="java.lang.Long">
+        select tag_id from `ms_article_tag` group by tag_id order by count(*) desc limit #{limit}
+    </select>
+<!--    List<Tag> findtagsByTagIds(List<Long> tagIds);-->
+    <select id="findtagsByTagIds" parameterType="list" resultType="com.txy.blog.dao.pojo.Tag">
+--         mybatis坑之查询的结果必须和类中标识的类名一致
+        select id,tag_name as tagName from ms_tag
+        where id in
+        <foreach collection="tagIds" item="tarId" separator="," open="(" close=")">
+            #{tarId}
+        </foreach>
+    </select>
+</mapper>
