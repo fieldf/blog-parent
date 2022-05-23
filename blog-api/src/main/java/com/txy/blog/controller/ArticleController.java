@@ -25,6 +25,7 @@ public class ArticleController {
     @LogAnnotation(module="文章",operator="获取文章列表")
     @Cache(expire = 5*60*1000,name="listArticle")
     public Result listArticle(@RequestBody PageParams pageParams) {
+        // test branch dev
         return articleService.listArticle(pageParams);
     }
 
