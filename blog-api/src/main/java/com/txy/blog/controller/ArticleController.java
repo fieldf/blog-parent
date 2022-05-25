@@ -60,14 +60,46 @@ public class ArticleController {
         return articleService.listArchives();
     }
 
+    /**
+     * 文章详情
+     * @param articleId
+     * @return
+     */
     @PostMapping("view/{id}")
     public Result findArticleById(@PathVariable("id") Long articleId) {
         return articleService.findArticleById(articleId);
     }
 
+    /**
+     * 编辑文章显示详情
+     * @param articleId
+     * @return
+     */
+    @PostMapping("/{id}")
+    public Result findArticleEditById(@PathVariable("id") Long articleId) {
+        return articleService.findArticleEditById(articleId);
+    }
+
 //    接口url：/articles/publish
+
+    /**
+     * 发布文章
+     * @param articleParam
+     * @return
+     */
     @PostMapping("publish")
     public Result publish(@RequestBody ArticleParam articleParam) {
         return articleService.publish(articleParam);
+    }
+
+
+    /**
+     * 发布文章
+     * @param articleParam
+     * @return
+     */
+    @PostMapping("edit")
+    public Result edit(@RequestBody ArticleParam articleParam) {
+        return articleService.edit(articleParam);
     }
 }

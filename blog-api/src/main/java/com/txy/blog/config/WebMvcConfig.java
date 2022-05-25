@@ -18,6 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 客户端访问前端8080,点击一些东西会访问一些路径，通过nginx代理到我的8888端口。
         registry.addMapping("/**")
                 .allowedOrigins("http://182.92.10.237","null")
+                .allowedOrigins("http://localhost:8080")
                 .allowedMethods("POST","GET","PUT","OPTIONS","DELETE")
                 .maxAge(3600)
                 .allowCredentials(true);

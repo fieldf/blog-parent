@@ -17,17 +17,16 @@ import com.txy.blog.vo.ArticleBodyVo;
 import com.txy.blog.vo.ArticleVo;
 import com.txy.blog.vo.Result;
 import com.txy.blog.vo.TagVo;
+import com.txy.blog.vo.params.ArticleBodyParam;
 import com.txy.blog.vo.params.ArticleParam;
 import com.txy.blog.vo.params.PageParams;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -42,6 +41,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private ArticleTagMapper articleTagMapper;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
 
 //    @Override
@@ -184,7 +186,87 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.updateById(article);
         Map<String,String> map=new HashMap<>();
         map.put("id",article.getId().toString());
+
+        // 删除文章缓存
+        deleteRedisArticles();
+        // 删除最新文章缓存
+        deleteRedisNewsArticles();
         return Result.success(map);
+    }
+
+    /**
+     * 显示文章编辑信息
+     * @param articleId
+     * @return
+     */
+    @Override
+    public Result findArticleEditById(Long articleId) {
+        Article article = this.articleMapper.selectById(articleId);
+
+        ArticleVo articleVo = copy(article, true, true,true,true);
+        return Result.success(articleVo);
+    }
+
+    /**
+     * 编辑文章
+     * @param articleParam
+     * @return
+     */
+    @Override
+    public Result edit(ArticleParam articleParam) {
+        // 更新title
+        LambdaQueryWrapper<Article> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.eq(Article::getId,articleParam.getId());
+        Article article = articleMapper.selectOne(queryWrapper);
+        article.setTitle(articleParam.getTitle());
+        article.setSummary(articleParam.getSummary());
+        article.setCategoryId(Long.valueOf(articleParam.getCategory().getId()));
+        articleMapper.updateById(article);
+        // 更新body
+        ArticleBodyParam body = articleParam.getBody();
+        LambdaQueryWrapper<ArticleBody> queryWrapper1=new LambdaQueryWrapper<>();
+        queryWrapper1.eq(ArticleBody::getArticleId, articleParam.getId());
+        ArticleBody articleBody = articleBodyMapper.selectOne(queryWrapper1);
+        articleBody.setContent(body.getContent());
+        articleBody.setContentHtml(body.getContentHtml());
+        articleBodyMapper.updateById(articleBody);
+        Map<String,String> map=new HashMap<>();
+        map.put("id",article.getId().toString());
+        // 标签
+        List<TagVo> tags = articleParam.getTags();
+        // 把旧的标签删除
+        LambdaQueryWrapper<ArticleTag> queryWrapper2=new LambdaQueryWrapper<>();
+        queryWrapper2.eq(ArticleTag::getArticleId, article.getId());
+        articleTagMapper.delete(queryWrapper2);
+        if (tags!=null) {
+            for (TagVo tag: tags) {
+                Long articleId = article.getId();
+                ArticleTag articleTag=new ArticleTag();
+                articleTag.setArticleId(articleId);
+                articleTag.setTagId(Long.parseLong(tag.getId()));
+                articleTagMapper.insert(articleTag);
+            }
+        }
+        return Result.success(map);
+    }
+
+    /**
+     * 删除首页文章缓存
+     * listArticle::ArticleController::listArticle::83dab9ea501defddc22656c0e4f2d80f
+     * @return
+     */
+    private void deleteRedisArticles() {
+//        String key="listArticle::ArticleController::listArticle::";
+        String key="listArticle";
+        Set<String> keys=redisTemplate.keys(key+"*");
+        System.out.println("listArticle"+redisTemplate.delete(keys));
+    }
+
+    private void deleteRedisNewsArticles() {
+//        String key="news_article::ArticleController::newArticles::";
+        String key="news_article";
+        Set<String> keys=redisTemplate.keys(key+"*");
+        System.out.println("news_article"+redisTemplate.delete(keys));
     }
 
     private List<ArticleVo> copyList(List<Article> records,boolean isTag, boolean isAuthor) {

@@ -46,4 +46,8 @@ public interface ArticleService {
      * @return
      */
     Result publish(ArticleParam articleParam);
+
+    Result findArticleEditById(Long articleId);
+
+    Result edit(ArticleParam articleParam);
 }

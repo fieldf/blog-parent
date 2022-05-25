@@ -4,9 +4,9 @@
         <!-- 页面meta -->
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>码神之路博客管理后台</title>
-        <meta name="description" content="码神之路博客管理后台">
-        <meta name="keywords" content="码神之路博客管理后台">
+        <title>芝麻小咚博客管理后台</title>
+        <meta name="description" content="芝麻小咚博客管理后台">
+        <meta name="keywords" content="芝麻小咚博客管理后台">
         <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
         <!-- 引入样式 -->
         <link rel="stylesheet" href="../plugins/elementui/index.css">
@@ -27,30 +27,40 @@
     <body class="hold-transition">
         <div id="app">
             <div class="content-header">
-                <h1>网站管理<small>权限管理</small></h1>
+                <h1>网站管理<small>文章管理</small></h1>
                 <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
                     <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
                     <el-breadcrumb-item>网站管理</el-breadcrumb-item>
-                    <el-breadcrumb-item>权限管理</el-breadcrumb-item>
+                    <el-breadcrumb-item>文章管理</el-breadcrumb-item>
                 </el-breadcrumb>
             </div>
             <div class="app-container">
                 <div class="box">
                     <div class="filter-container">
                         <!--v-model双向绑定，页面那个位置有值，对象pagination的属性queryString就有值了-->
-                        <el-input placeholder="权限名称" v-model="pagination.queryString" style="width: 200px;" class="filter-item"></el-input>
+                        <el-input placeholder="分类名称" v-model="pagination.queryString" style="width: 200px;" class="filter-item"></el-input>
                         <el-button @click="findSearchPage()" class="dalfBut">查询</el-button>
-                        <el-button type="primary" class="butT" @click="handleCreate()">新建权限</el-button>
+                        <el-button type="primary" class="butT" @click="handleCreate()">新建分类</el-button>
                     </div>
                     <el-table size="small" current-row-key="id" :data="dataList" stripe highlight-current-row>
                         <el-table-column  align="center" label="序号" prop="id"></el-table-column>
                         <el-table-column label="编号" align="center" prop="id">
                         </el-table-column>
-                        <el-table-column label="名称" align="center" prop="name">
+                        <el-table-column label="标题" align="center" prop="title">
                         </el-table-column>
-                        <el-table-column label="路径" align="center" prop="path">
+                        <el-table-column label="简介" align="center" prop="summary">
                         </el-table-column>
-                        <el-table-column label="描述" align="center" prop="description">
+                        <el-table-column label="评论数" align="center" prop="commentCounts">
+                        </el-table-column>
+                        <el-table-column label="查看数" align="center" prop="viewCounts">
+                        </el-table-column>
+                        <el-table-column label="置顶" align="center" prop="weight">
+                        </el-table-column>
+                        <el-table-column label="创建时间" align="center" prop="createDate">
+                        </el-table-column>
+                        <el-table-column label="作者" align="center" prop="author">
+                        </el-table-column>
+                        <el-table-column label="分类" align="center" prop="category.categoryName">
                         </el-table-column>
                         <el-table-column label="操作" align="center">
                             <template slot-scope="scope">
@@ -75,15 +85,15 @@
                                     <el-form ref="dataAddForm" :model="formData" :rules="rules" label-position="right" label-width="100px">
                                         <el-row>
                                             <el-col >
-                                                <el-form-item label="名称" prop="name">
-                                                    <el-input  v-model="formData.name"/>
+                                                <el-form-item label="名称" prop="categoryName">
+                                                    <el-input  v-model="formData.categoryName"/>
                                                 </el-form-item>
                                             </el-col>
                                         </el-row>
                                         <el-row>
                                             <el-col >
-                                                <el-form-item label="路径" prop="path">
-                                                    <el-input  v-model="formData.path"/>
+                                                <el-form-item label="图标" prop="avatar">
+                                                    <el-input  v-model="formData.avatar"/>
                                                 </el-form-item>
                                             </el-col>
                                         </el-row>
@@ -108,26 +118,52 @@
                             <el-form ref="dataAddForm" :model="formData" :rules="rules" label-position="right" label-width="100px">
                                 <el-row>
                                     <el-col >
-                                        <el-form-item label="名称" prop="name">
-                                            <el-input  v-model="formData.name"/>
+                                        <el-form-item label="标题" prop="title">
+                                            <el-input  v-model="formData.title"/>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
                                 <el-row>
                                     <el-col >
-                                        <el-form-item label="路径" prop="path">
-                                            <el-input  v-model="formData.path"/>
+                                        <el-form-item label="简介" prop="summary">
+                                            <el-input  v-model="formData.summary"/>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
                                 <el-row>
                                     <el-col >
-                                        <el-form-item label="描述" prop="description">
-                                            <el-input  v-model="formData.description"/>
+                                        <el-form-item label="置顶" prop="weight">
+                                            <el-input  v-model="formData.weight"/>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
+                                <el-row>
+                                    <el-col >
+                                        <el-form-item label="作者" prop="author">
+                                            <el-input  v-model="formData.author"/>
+                                        </el-form-item>
+                                    </el-col>
+                                </el-row>
+                                <el-form-item label="摘要" prop="summary">
+                                    <el-input type="textarea"
+                                              v-model="formData.summary"
+                                              :rows="6"
+                                              placeholder="请输入摘要">
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="文章分类" prop="category">
+                                    <el-select v-model="formData.category" value-key="id" placeholder="请选择文章分类">
+                                        <el-option v-for="c in categorys" :key="c.id" :label="c.categoryName" :value="c"></el-option>
+                                    </el-select>
+                                </el-form-item>
+<!--                                        :value代表绑定的东西往里面赋值的意思，所以用c-->
+                                <el-form-item label="文章标签" prop="tags">
+                                    <el-checkbox-group v-model="formData.tags">
+                                        <el-checkbox v-for="t in tags" :key="t.id" :label="t.id" name="tags">{{t.tagName}}</el-checkbox>
+                                    </el-checkbox-group>
+                                </el-form-item>
                             </el-form>
+
                             <div slot="footer" class="dialog-footer">
                                 <el-button @click="dialogFormVisibleEdit = false">取消</el-button>
                                 <el-button type="primary" @click="handleEdit()">确定</el-button>
@@ -176,7 +212,7 @@
                 },
                 pagination: {//分页相关模型数据
 					  currentPage: 1,//当前页码
-					  pageSize:2,//每页显示的记录数
+					  pageSize:5,//每页显示的记录数
 					  total:0,//总记录数
 					  queryString:null//查询条件
 				},
@@ -186,7 +222,11 @@
                 fbChoiceList: [{
                    content: "",
                 }],
+                categorys: [],
+                tags: [],
                 formData: {
+                    // category: {},
+                    // tags:[]
                 },//表单数据
                 dialogFormVisible: false,//增加表单是否可见
                 dialogFormVisibleEdit:false,
@@ -197,9 +237,37 @@
             },
             //钩子函数，VUE对象初始化完成后自动执行
             created() {
+                this.getCategorysAndTags();
                 this.findPage();
             },
             methods: {
+                getCategorysAndTags() {
+                    axios.get("/admin/category/all").then(data => {
+                        if(data.data.success){
+                            this.categorys = data.data.data
+                        }else{
+                            this.$message({type: 'error', message: '文章分类加载失败', showClose: true})
+                        }
+
+                    }).catch(error => {
+                        if (error !== 'error') {
+                            this.$message({type: 'error', message: '文章分类加载失败', showClose: true})
+                        }
+                    })
+
+                    axios.get("/admin/tags/all").then(data => {
+                        if(data.data.success){
+                            this.tags = data.data.data
+                        }else{
+                            this.$message({type: 'error', message: '标签加载失败', showClose: true})
+                        }
+                    }).catch(error => {
+                        if (error !== 'error') {
+                            this.$message({type: 'error', message: '标签加载失败2', showClose: true})
+                        }
+                    })
+
+                },
                 handleAvatarSuccess(){
 
                 },
@@ -208,7 +276,11 @@
                 },
                 //编辑
                 handleEdit() {
-                    axios.post("/admin/permission/update",this.formData).then((res)=>{
+                    let tags = this.formData.tags.map(function (item) {
+                        return {id: item};
+                    });
+                    this.formData.tags = tags;
+                    axios.post("/admin/article/update",this.formData).then((res)=>{
                         if (res.data.success){
                             this.$message({
                                 message: '恭喜你，编辑成功',
@@ -225,7 +297,7 @@
                 },
                 //添加
                 handleAdd () {
-                    axios.post("/admin/permission/add",this.formData).then((res)=>{
+                    axios.post("/admin/article/add",this.formData).then((res)=>{
                         if (res.data.success){
                             this.$message({
                                 message: '恭喜你，添加成功',
@@ -246,7 +318,7 @@
                 },
                 //分页查询
                 findPage() {
-                    axios.post("/admin/permission/permissionList",this.pagination).then((res)=>{
+                    axios.post("/admin/article/articleList",this.pagination).then((res)=>{
                         if (res.data.success){
                             this.dataList = res.data.data.list;
                             this.pagination.total = res.data.data.total;
@@ -285,7 +357,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        axios.post("/admin/permission/delete/"+row.id).then((res)=>{
+                        axios.post("/admin/article/delete/"+row.id).then((res)=>{
                             if (res.data.success){
                                 this.$message.success("删除成功");
                                 this.findPage();

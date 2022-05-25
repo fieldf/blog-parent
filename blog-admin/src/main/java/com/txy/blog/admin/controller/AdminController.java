@@ -4,6 +4,7 @@ import com.txy.blog.admin.model.params.PageParam;
 import com.txy.blog.admin.pojo.Permission;
 import com.txy.blog.admin.service.PermissionService;
 import com.txy.blog.admin.vo.Result;
+import com.txy.blog.dao.pojo.Article;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +29,10 @@ public class AdminController {
         return permissionService.update(permission);
     }
 
-    @GetMapping("permission/delete/{id}")
+    @PostMapping("permission/delete/{id}")
     public Result delete(@PathVariable("id") Long id){
         return permissionService.delete(id);
     }
+
 
 }
