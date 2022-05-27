@@ -116,4 +116,17 @@
             <version>[7.7.0, 7.7.99]</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.txy.blog.BlogApp</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

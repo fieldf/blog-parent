@@ -16,12 +16,23 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 跨域配置
         // 我后端所有的接口都允许http://182.92.10.237来访问
         // 客户端访问前端8080,点击一些东西会访问一些路径，通过nginx代理到我的8888端口。
+
+        // 博客get请求正常，post报错；管理系统正常
+//        registry.addMapping("/**")
+//                .allowedOrigins("http://182.92.10.237","null")
+//                .allowedOrigins("http://localhost:8080")
+//                .allowedMethods("POST","GET","PUT","OPTIONS","DELETE")
+//                .maxAge(3600)
+//                .allowCredentials(true);
+
+        // 博客正常访问，管理系统进不去
         registry.addMapping("/**")
-                .allowedOrigins("http://182.92.10.237","null")
-                .allowedOrigins("http://localhost:8080")
-                .allowedMethods("POST","GET","PUT","OPTIONS","DELETE")
+                .allowedOriginPatterns("*")
+                .allowedMethods("*")
+                .allowCredentials(true)
                 .maxAge(3600)
-                .allowCredentials(true);
+                .allowedHeaders("*");
+
     }
 
     @Override

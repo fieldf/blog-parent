@@ -18,6 +18,7 @@ import com.txy.blog.service.TagService;
 import com.txy.blog.vo.TagVo;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -77,7 +78,7 @@ public class AdminArticleService {
         ArticleVo articleVo=new ArticleVo();
         articleVo.setId(String.valueOf(article.getId()));
         BeanUtils.copyProperties(article,articleVo);
-        articleVo.setCreateDate(new DateTime(article.getCreateDate()).toString("yyyy-MM-dd HH:mm"));
+        articleVo.setCreateDate(new DateTime(article.getCreateDate(), DateTimeZone.forOffsetHours(8)).toString("yyyy-MM-dd HH:mm"));
         // 并不是所有的接口，都需要标签，作者信息
         if (isTag) {
             Long id = article.getId();
