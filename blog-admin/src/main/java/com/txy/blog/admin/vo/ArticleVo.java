@@ -2,9 +2,6 @@ package com.txy.blog.admin.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.txy.blog.vo.ArticleBodyVo;
-import com.txy.blog.vo.CategoryVo;
-import com.txy.blog.vo.TagVo;
 import lombok.Data;
 
 import java.util.List;

@@ -2,20 +2,19 @@ package com.txy.blog.admin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.txy.blog.admin.config.QiniuConfig;
+import com.txy.blog.admin.mapper.ArticleMapper;
+import com.txy.blog.admin.mapper.ArticleTagMapper;
 import com.txy.blog.admin.model.params.ArticleParam;
 import com.txy.blog.admin.model.params.PageParam;
+import com.txy.blog.admin.pojo.Article;
+import com.txy.blog.admin.pojo.ArticleTag;
 import com.txy.blog.admin.pojo.Tag;
+import com.txy.blog.admin.utils.QiniuUtils;
 import com.txy.blog.admin.vo.ArticleVo;
 import com.txy.blog.admin.vo.PageResult;
 import com.txy.blog.admin.vo.Result;
-import com.txy.blog.dao.mapper.ArticleMapper;
-import com.txy.blog.dao.mapper.ArticleTagMapper;
-import com.txy.blog.dao.pojo.Article;
-import com.txy.blog.dao.pojo.ArticleTag;
-import com.txy.blog.service.CategoryService;
-import com.txy.blog.service.SysUserService;
-import com.txy.blog.service.TagService;
-import com.txy.blog.vo.TagVo;
+import com.txy.blog.admin.vo.TagVo;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -23,10 +22,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class AdminArticleService {
@@ -47,6 +49,9 @@ public class AdminArticleService {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private QiniuConfig qiniuConfig;
 
     public Result articleList(PageParam pageParam) {
         // 不能直接用blog-api中的articleService，因为前端传来的参数差距很大，所以还是自己写service

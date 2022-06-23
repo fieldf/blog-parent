@@ -46,7 +46,10 @@
                         <el-table-column  align="center" label="序号" prop="id"></el-table-column>
                         <el-table-column label="编号" align="center" prop="id">
                         </el-table-column>
-                        <el-table-column label="图标" align="center" prop="avatar">
+                        <el-table-column label="图标" align="center">
+                            <template slot-scope="scope">
+                                <img :src="scope.row.avatar" width="40" height="40" class="head_pic"/>
+                            </template>
                         </el-table-column>
                         <el-table-column label="名称" align="center" prop="tagName">
                         </el-table-column>
@@ -81,7 +84,17 @@
                                         <el-row>
                                             <el-col >
                                                 <el-form-item label="图标" prop="avatar">
-                                                    <el-input  v-model="formData.avatar"/>
+<!--                                                    <el-input  v-model="formData.avatar"/>-->
+                                                    <el-upload
+                                                            class="avatar-uploader"
+                                                            action="/admin/tags/upload"
+                                                            name="imageFile"
+                                                            :show-file-list="false"
+                                                            :on-success="handleAvatarSuccess"
+                                                            :before-upload="beforeAvatarUpload">
+                                                        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                                    </el-upload>
                                                 </el-form-item>
                                             </el-col>
                                         </el-row>
@@ -107,7 +120,17 @@
                                 <el-row>
                                     <el-col >
                                         <el-form-item label="图标" prop="avatar">
-                                            <el-input  v-model="formData.avatar"/>
+<!--                                            <el-input  v-model="formData.avatar"/>-->
+                                            <el-upload
+                                                    class="avatar-uploader"
+                                                    action="/admin/tags/upload"
+                                                    name="imageFile"
+                                                    :show-file-list="false"
+                                                    :on-success="handleAvatarSuccess"
+                                                    :before-upload="beforeAvatarUpload">
+                                                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                            </el-upload>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -176,7 +199,8 @@
                 dialogFormVisibleEdit:false,
                 rules: {//校验规则
                     name: [{ required: true, message: '必填项', trigger: 'blur' }],
-                }
+                },
+                imageUrl:""
 
             },
             //钩子函数，VUE对象初始化完成后自动执行
@@ -184,11 +208,17 @@
                 this.findPage();
             },
             methods: {
-                handleAvatarSuccess(){
-
+                handleAvatarSuccess(res,file){
+                    // res==CallResult
+                    this.imageUrl=res.data;
+                    this.formData.avatar = res.data;
                 },
-                beforeAvatarUpload(){
-
+                beforeAvatarUpload(file){
+                    const isLt2M = file.size / 1024 / 1024 < 2;
+                    if (!isLt2M) {
+                        this.$message.error('上传图片大小不能超过 2MB!');
+                    }
+                    return isLt2M;
                 },
                 //编辑
                 handleEdit() {
@@ -209,6 +239,7 @@
                 },
                 //添加
                 handleAdd () {
+                    resetForm();
                     axios.post("/admin/tags/add",this.formData).then((res)=>{
                         if (res.data.success){
                             this.$message({
@@ -224,6 +255,7 @@
                         }
                     });
                 },
+
                 findSearchPage(){
                     this.pagination.currentPage = 1;
                     this.findPage();
@@ -246,6 +278,7 @@
                     this.formData = {};
                     this.subjects = [];
                     this.tableData = {};
+                    this.imageUrl="";
                 },
                 // 弹出添加窗口
                 handleCreate() {
@@ -257,6 +290,7 @@
                     this.resetForm();
                     this.dialogFormVisibleEdit = true;
                     this.formData = row;
+                    this.imageUrl=this.formData.avatar;
                 },
                 //切换页码
                 handleCurrentChange(currentPage) {

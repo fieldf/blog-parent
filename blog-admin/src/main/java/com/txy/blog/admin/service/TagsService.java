@@ -2,22 +2,28 @@ package com.txy.blog.admin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.txy.blog.admin.config.QiniuConfig;
 import com.txy.blog.admin.mapper.AdminArticleTagMapper;
 import com.txy.blog.admin.mapper.TagsMapper;
 import com.txy.blog.admin.model.params.PageParam;
 import com.txy.blog.admin.pojo.ArticleTag;
 import com.txy.blog.admin.pojo.Tag;
+import com.txy.blog.admin.utils.QiniuUtils;
 import com.txy.blog.admin.vo.PageResult;
 import com.txy.blog.admin.vo.Result;
-import com.txy.blog.vo.TagVo;
+import com.txy.blog.admin.vo.TagVo;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.invoke.LambdaMetafactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TagsService {
@@ -26,6 +32,9 @@ public class TagsService {
 
     @Autowired
     private AdminArticleTagMapper adminArticleTagMapper;
+
+    @Autowired
+    private QiniuConfig qiniuConfig;
 
     /**
      * 分页显示所有标签
@@ -101,5 +110,28 @@ public class TagsService {
             list.add(String.valueOf(tag.getTagId()));
         }
         return list;
+    }
+
+    public Result upload(MultipartFile file) {
+        String accessKey = qiniuConfig.getAccessKey();
+        String accessSecret = qiniuConfig.getAccessSecret();
+        String bucket = qiniuConfig.getBucket();
+        String fileServerUrl = qiniuConfig.getFileServerUrl();
+        String originalFilename = file.getOriginalFilename();
+        DateTime dateTime=new DateTime();
+        String fileName="tags/"+
+                dateTime.toString("yyyy")+"/" +
+                dateTime.toString("MM")+"/"+
+                UUID.randomUUID().toString()+"."+
+                StringUtils.substringAfterLast(originalFilename,".");
+        try {
+            boolean upload = QiniuUtils.upload(accessKey, accessSecret, bucket, file.getBytes(), fileName);
+            if (upload) {
+                return Result.success(fileServerUrl+fileName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Result.fail(-999,"图片上传失败");
     }
 }

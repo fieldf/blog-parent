@@ -12,5 +12,4 @@ public @interface Cache {
 
     // 缓存标识key
     String name() default "";
-
 }

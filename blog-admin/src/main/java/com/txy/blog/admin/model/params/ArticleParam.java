@@ -1,8 +1,8 @@
 package com.txy.blog.admin.model.params;
 
-import com.txy.blog.vo.ArticleBodyVo;
-import com.txy.blog.vo.CategoryVo;
-import com.txy.blog.vo.TagVo;
+import com.txy.blog.admin.vo.ArticleBodyVo;
+import com.txy.blog.admin.vo.CategoryVo;
+import com.txy.blog.admin.vo.TagVo;
 import lombok.Data;
 
 import java.util.List;

@@ -48,7 +48,10 @@
                         </el-table-column>
                         <el-table-column label="名称" align="center" prop="categoryName">
                         </el-table-column>
-                        <el-table-column label="图标" align="center" prop="avatar">
+                        <el-table-column label="图标" align="center">
+                            <template slot-scope="scope">
+                                <img :src="scope.row.avatar" width="40" height="40" class="head_pic"/>
+                            </template>
                         </el-table-column>
                         <el-table-column label="描述" align="center" prop="description">
                         </el-table-column>
@@ -83,7 +86,17 @@
                                         <el-row>
                                             <el-col >
                                                 <el-form-item label="图标" prop="avatar">
-                                                    <el-input  v-model="formData.avatar"/>
+<!--                                                    <el-input  v-model="formData.avatar"/>-->
+                                                    <el-upload
+                                                            class="avatar-uploader"
+                                                            action="/admin/category/upload"
+                                                            name="imageFile"
+                                                            :show-file-list="false"
+                                                            :on-success="handleAvatarSuccess"
+                                                            :before-upload="beforeAvatarUpload">
+                                                        <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                                    </el-upload>
                                                 </el-form-item>
                                             </el-col>
                                         </el-row>
@@ -116,7 +129,17 @@
                                 <el-row>
                                     <el-col >
                                         <el-form-item label="图标" prop="avatar">
-                                            <el-input  v-model="formData.avatar"/>
+<!--                                            <el-input  v-model="formData.avatar"/>-->
+                                            <el-upload
+                                                    class="avatar-uploader"
+                                                    action="/admin/category/upload"
+                                                    name="imageFile"
+                                                    :show-file-list="false"
+                                                    :on-success="handleAvatarSuccess"
+                                                    :before-upload="beforeAvatarUpload">
+                                                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                            </el-upload>
                                         </el-form-item>
                                     </el-col>
                                 </el-row>
@@ -180,6 +203,7 @@
 					  total:0,//总记录数
 					  queryString:null//查询条件
 				},
+                imageUrl: "",
 				dataList: [],//当前页要展示的分页列表数据
                 subjectList: [],
                 tableData: {},
@@ -200,11 +224,17 @@
                 this.findPage();
             },
             methods: {
-                handleAvatarSuccess(){
-
+                handleAvatarSuccess(res,file){
+                    // res==CallResult
+                    this.imageUrl=res.data;
+                    this.formData.avatar = res.data;
                 },
-                beforeAvatarUpload(){
-
+                beforeAvatarUpload(file){
+                    const isLt2M = file.size / 1024 / 1024 < 2;
+                    if (!isLt2M) {
+                        this.$message.error('上传图片大小不能超过 2MB!');
+                    }
+                    return isLt2M;
                 },
                 //编辑
                 handleEdit() {
@@ -273,6 +303,7 @@
                     this.resetForm();
                     this.dialogFormVisibleEdit = true;
                     this.formData = row;
+                    this.imageUrl=this.formData.avatar;
                 },
                 //切换页码
                 handleCurrentChange(currentPage) {
